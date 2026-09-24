@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Captura de Câmara HTML5</title>
+    <!-- Fonte Inter para um visual limpo e minimalista -->
+    <link rel="preconnect" href="https://googleapis.com">
+    <link rel="preconnect" href="https://gstatic.com" crossorigin>
+    <link href="https://googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --primary: #3b82f6;
+            --primary-hover: #2563eb;
+            --text: #f8fafc;
+            --text-muted: #94a3b8;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background-color: var(--bg-color);
+            font-family: 'Inter', sans-serif;
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .camera-container {
+            background-color: var(--card-bg);
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 640px;
+            text-align: center;
+        }
+
+        h2 { font-size: 24px; margin-bottom: 10px; font-weight: 700; }
+        p { color: var(--text-muted); font-size: 14px; margin-bottom: 25px; }
+
+        /* Espaço onde o vídeo da câmara vai rodar */
+        .video-box {
+            width: 100%;
+            aspect-ratio: 16/9;
+            background-color: #000000;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 25px;
+            position: relative;
+            border: 2px solid #334155;
+        }
+
+        video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transform: scaleX(-1); /* Efeito de espelho natural para o utilizador */
+        }
+
+        .status-overlay {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: rgba(0, 0, 0, 0.6);
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-camera {
+            background-color: var(--primary);
+            color: var(--text);
+            border: none;
+            padding: 14px 28px;
+            font-size: 15px;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-camera:hover {
+            background-color: var(--primary-hover);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="camera-container">
+        <h2>Acesso à Câmara Local</h2>
+        <p>Clique no botão abaixo para ativar e visualizar o feed da sua câmara neste dispositivo.</p>
+
+        <div class="video-box">
+            <div id="statusLabel" class="status-overlay" style="color: #ef4444;">🔴 DESLIGADA</div>
+            <!-- O elemento de vídeo que vai receber o stream da câmara -->
+            <video id="webcam" autoplay playsinline></video>
+        </div>
+
+        <button id="startBtn" class="btn-camera" onclick="initCamera()">Ligar Câmara</button>
+    </div>
+
+    <!-- Script JavaScript para aceder ao hardware do dispositivo -->
+    <script>
+        async function initCamera() {
+            const video = document.getElementById('webcam');
+            const statusLabel = document.getElementById('statusLabel');
+            const startBtn = document.getElementById('startBtn');
+
+            try {
+                // Solicita acesso nativo do browser à câmara do utilizador
+                const stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { facingMode: "user" }, // "user" abre a câmara frontal/selfie
+                    audio: false 
+                });
+                
+                // Conecta o fluxo da câmara diretamente na tag <video>
+                video.srcObject = stream;
+                
+                // Atualiza a interface
+                statusLabel.innerText = "🟢 EM DIRETO";
+                statusLabel.style.color = "#10b981";
+                startBtn.style.display = "none"; // Esconde o botão após ligar
+                
+            } catch (error) {
+                console.error("Erro ao aceder à câmara:", error);
+                alert("Não foi possível aceder à câmara. Certifique-se de que deu permissão no seu navegador.");
+            }
+        }
+    </script>
+
+</body>
+</html>
